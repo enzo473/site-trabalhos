@@ -1,0 +1,300 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Gerador Profissional de Trabalhos — Pro</title>
+
+  <!-- Google Font -->
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;800&display=swap" rel="stylesheet">
+
+  <style>
+    :root{
+      --bg:#07060a; --panel:#0f1114; --muted:#98a1ad; --accent:#6b5cff; --accent-2:#20c997;
+      --radius:12px; --card-pad:18px;
+    }
+    *{box-sizing:border-box}
+    html,body{height:100%}
+    body{margin:0;font-family:Inter,system-ui,-apple-system,Segoe UI,Roboto,Arial;color:#eaf2ff;background:linear-gradient(180deg,#060509 0%, #07060a 100%);-webkit-font-smoothing:antialiased}
+
+    header{display:flex;align-items:center;justify-content:space-between;padding:18px 28px;border-bottom:1px solid rgba(255,255,255,0.03)}
+    .brand{display:flex;gap:14px;align-items:center}
+    .logo{width:48px;height:48px;border-radius:10px;background:linear-gradient(135deg,var(--accent),#8a78ff);display:flex;align-items:center;justify-content:center;font-weight:800}
+    h1{font-size:16px;margin:0}
+    .sub{font-size:13px;color:var(--muted)}
+
+    .top-actions{display:flex;gap:10px;align-items:center}
+    .btn{background:var(--accent);border:none;color:#fff;padding:8px 12px;border-radius:10px;cursor:pointer;font-weight:600}
+    .btn.ghost{background:transparent;border:1px solid rgba(255,255,255,0.04)}
+    .btn.small{padding:6px 8px;font-size:13px}
+
+    main{max-width:1200px;margin:26px auto;padding:0 18px;display:grid;grid-template-columns:360px 1fr;gap:22px}
+    .panel{background:linear-gradient(180deg,var(--panel), rgba(255,255,255,0.01));padding:var(--card-pad);border-radius:var(--radius);border:1px solid rgba(255,255,255,0.02)}
+    label{font-size:13px;color:var(--muted);display:block;margin-bottom:8px}
+    input[type=text],select,textarea{width:100%;padding:10px;border-radius:10px;border:1px solid rgba(255,255,255,0.04);background:transparent;color:inherit}
+    textarea{min-height:110px}
+
+    .section-title{font-weight:700;margin-bottom:8px;font-size:15px}
+    .muted{font-size:13px;color:var(--muted)}
+
+    .controls-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+
+    #preview{min-height:420px;padding:18px;border-radius:10px;background:linear-gradient(180deg,rgba(255,255,255,0.01),transparent);overflow:auto}
+    .preview-header{display:flex;justify-content:space-between;align-items:center}
+
+    .template-card{background:linear-gradient(180deg,rgba(255,255,255,0.02),transparent);padding:12px;border-radius:10px;border:1px solid rgba(255,255,255,0.02);cursor:pointer}
+    .template-card.selected{box-shadow:0 6px 20px rgba(0,0,0,0.6);outline:2px solid rgba(107,92,255,0.12)}
+
+    .footer{max-width:1200px;margin:18px auto;padding:12px 18px;color:var(--muted);font-size:13px}
+
+    img.generated{max-width:100%;border-radius:8px;margin:10px 0;display:block}
+
+    /* responsive */
+    @media (max-width:980px){main{grid-template-columns:1fr;padding:8px} .controls-grid{grid-template-columns:1fr}}
+  </style>
+
+  <!-- libs -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/docx/7.6.0/browser/docx.umd.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/PptxGenJS/3.9.0/pptxgen.bundle.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+</head>
+<body>
+  <header>
+    <div class="brand">
+      <div class="logo">GT</div>
+      <div>
+        <h1>Gerador Profissional de Trabalhos — Pro</h1>
+        <div class="sub">Templates profissionais • Export ABNT • Imagens automáticas • Salvar & Histórico</div>
+      </div>
+    </div>
+
+    <div class="top-actions">
+      <button class="btn small" id="saveDraftBtn">Salvar rascunho</button>
+      <button class="btn ghost small" id="undoBtn">Desfazer</button>
+      <button class="btn" id="publishBtn">Publicar (Exportar)</button>
+    </div>
+  </header>
+
+  <main>
+    <!-- LEFT: controls -->
+    <aside class="panel">
+      <div class="section-title">Conteúdo & Estrutura</div>
+      <label>Tema</label>
+      <input id="tema" placeholder="Ex: Aquecimento Global" />
+
+      <div style="height:12px"></div>
+      <label>Template profissional</label>
+      <div class="controls-grid" id="templatesList">
+        <div class="template-card selected" data-template="academico">Acadêmico (ABNT)</div>
+        <div class="template-card" data-template="moderno">Moderno (com imagens)</div>
+        <div class="template-card" data-template="relatorio">Relatório executivo</div>
+        <div class="template-card" data-template="pptx">Apresentação (PPT)</div>
+      </div>
+
+      <div style="height:12px"></div>
+      <label>Formato</label>
+      <select id="formato">
+        <option value="texto">Documento</option>
+        <option value="pdf">PDF (print)</option>
+        <option value="word">Word (.docx)</option>
+        <option value="powerpoint">PowerPoint (.pptx)</option>
+      </select>
+
+      <div style="height:12px"></div>
+      <label>Estilo / Nível</label>
+      <div class="controls-grid">
+        <select id="nivel"><option>Ensino Médio</option><option>Ensino Superior</option></select>
+        <select id="iaNivel"><option value="forte">Forte</option><option value="media">Média</option><option value="leve">Leve</option></select>
+      </div>
+
+      <div style="height:12px"></div>
+      <label>Imagens & Mídia</label>
+      <div class="muted" style="margin-bottom:8px">Adicione imagens automáticas e escolha quantas por seção</div>
+      <div class="controls-grid">
+        <div style="display:flex;align-items:center;gap:8px"><input id="incluirImagens" type="checkbox"/><label class="muted">Incluir imagens</label></div>
+        <select id="qtdImagens"><option>1</option><option selected>2</option><option>3</option><option>4</option></select>
+      </div>
+
+      <div style="height:12px"></div>
+      <label>Extras</label>
+      <div class="row"><label class="muted"><input id="addSumario" type="checkbox" checked/> Incluir Sumário</label></div>
+      <div class="row"><label class="muted"><input id="addReferencias" type="checkbox" checked/> Referências ABNT</label></div>
+      <div class="row"><label class="muted"><input id="addGrafico" type="checkbox"/> Incluir gráfico de exemplo</label></div>
+
+      <div style="height:12px"></div>
+      <label>Export & Integração</label>
+      <div class="muted">Integre com Google Drive, enviar por e-mail, CRM (opcional). SDK para desenvolvedores.</div>
+
+      <div style="margin-top:16px;display:flex;gap:10px">
+        <button class="btn" id="gerarBtn">Gerar trabalho</button>
+        <button class="btn ghost" id="previewBtn">Visualizar</button>
+      </div>
+
+      <div style="height:10px"></div>
+      <div class="muted">Modelos profissionais incluídos: capa acadêmica, capa moderna, sumário automático, formatação ABNT, rodapé e numeração.</div>
+    </aside>
+
+    <!-- RIGHT: preview -->
+    <section class="panel">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">
+        <div>
+          <strong>Preview</strong>
+          <div class="muted">Veja e ajuste antes de exportar</div>
+        </div>
+        <div style="display:flex;gap:10px">
+          <button class="btn small" id="downloadPdf">Baixar PDF</button>
+          <button class="btn small" id="downloadDoc">Baixar Word</button>
+        </div>
+      </div>
+
+      <div id="preview"></div>
+
+      <div style="margin-top:12px;display:flex;gap:8px;align-items:center">
+        <div class="muted">Histórico:</div>
+        <select id="history" style="min-width:200px"><option value="-1">-- Nenhum --</option></select>
+      </div>
+    </section>
+  </main>
+
+  <div class="footer">Gerador Pro • Versão beta — Recursos profissionais ativados</div>
+
+  <script>
+    // Professional features: templates, save drafts (localStorage), nicer output, word count, reading time
+    const templates = document.querySelectorAll('.template-card');
+    templates.forEach(t => t.addEventListener('click', ()=>{
+      templates.forEach(x=>x.classList.remove('selected'));
+      t.classList.add('selected');
+    }));
+
+    // helper
+    function setStatus(text){ document.getElementById('preview').innerHTML = `<div class='muted'>${text}</div>`; }
+
+    // save/load drafts
+    function saveDraft(){
+      const key = 'gerador_pro_draft_'+Date.now();
+      const data = collectInputs();
+      localStorage.setItem(key, JSON.stringify(data));
+      const sel = document.getElementById('history');
+      const opt = document.createElement('option'); opt.value = key; opt.text = new Date().toLocaleString(); sel.prepend(opt); sel.value = key;
+      alert('Rascunho salvo!');
+    }
+
+    function loadDraft(key){
+      const raw = localStorage.getItem(key);
+      if(!raw) return;
+      const d = JSON.parse(raw);
+      document.getElementById('tema').value = d.tema || '';
+      document.getElementById('qtdImagens').value = d.qtdImagens || '2';
+      document.getElementById('incluirImagens').checked = !!d.incluirImagens;
+      // set others as needed
+      renderWorkPreview(localGenerator((d||{}), d.iaNivel || 'media', d.incluirImagens));
+    }
+
+    document.getElementById('saveDraftBtn').addEventListener('click', saveDraft);
+    document.getElementById('history').addEventListener('change', (e)=>{ if(e.target.value !== '-1') loadDraft(e.target.value); });
+
+    // collect inputs
+    function collectInputs(){
+      return {
+        tema: document.getElementById('tema').value.trim(),
+        template: document.querySelector('.template-card.selected')?.dataset.template || 'academico',
+        formato: document.getElementById('formato').value,
+        nivel: document.getElementById('nivel').value,
+        iaNivel: document.getElementById('iaNivel').value,
+        incluirImagens: document.getElementById('incluirImagens').checked,
+        qtdImagens: document.getElementById('qtdImagens').value,
+        addSumario: document.getElementById('addSumario').checked,
+        addReferencias: document.getElementById('addReferencias').checked,
+        addGrafico: document.getElementById('addGrafico').checked
+      };
+    }
+
+    // enhanced local generator returns HTML (more structured, professional)
+    function localGenerator(p, iaNivel, includeImages=false){
+      const depth = iaNivel === 'forte' ? 3 : iaNivel === 'media' ? 2 : 1;
+      const now = new Date();
+      const title = `<div style='text-align:center;padding:14px 0'><h1 style='margin:0'>${p.tema}</h1><div class='muted'>Trabalho gerado automaticamente — ${now.getFullYear()}</div></div>`;
+
+      const sum = p.addSumario ? `<h3>SUMÁRIO</h3><ol><li>Introdução</li><li>Desenvolvimento</li><li>Conclusão</li><li>Referências</li></ol>` : '';
+
+      const intro = `<h2>Introdução</h2><p>${p.tema} — uma introdução com profundidade nível ${depth} que situa o leitor, define termos e apresenta a estrutura do trabalho.</p>`;
+
+      const sections = ['Definição e conceitos','Importância social','Exemplos práticos','Relações interdisciplinares'];
+      let dev = '<h2>Desenvolvimento</h2>';
+      sections.forEach((s,idx)=>{
+        dev += `<h3>${s}</h3><p>${s} — explicação desenvolvida (nível ${depth}).</p>`;
+        if(includeImages && idx < p.qtdImagens) dev += `<img class='generated' src='https://source.unsplash.com/900x500/?${encodeURIComponent(p.tema)}&sig=${idx}' alt='img'>`;
+      });
+
+      const concl = `<h2>Conclusão</h2><p>Resumo e fechamento com recomendações e perspectivas futuras.</p>`;
+      const refs = p.addReferencias ? `<h2>Referências</h2><p>SILVA, J. Exemplo. 2022.</p>` : '';
+
+      return title + sum + intro + dev + concl + refs;
+    }
+
+    // render preview
+    function renderWorkPreview(html){
+      const preview = document.getElementById('preview');
+      preview.innerHTML = html;
+      // word count + reading time
+      const text = preview.innerText || '';
+      const wc = text.split(/\s+/).filter(Boolean).length;
+      const rt = Math.max(1, Math.round(wc/200));
+      const meta = document.createElement('div'); meta.className='muted'; meta.style.marginTop='8px'; meta.innerText = `Palavras: ${wc} • Tempo de leitura: ${rt} min`;
+      preview.appendChild(meta);
+    }
+
+    // button handlers
+    document.getElementById('gerarBtn').addEventListener('click', async ()=>{
+      const inputs = collectInputs();
+      setStatus('Gerando — aguarde...');
+      // small debounce to simulate processing
+      await new Promise(r=>setTimeout(r,700));
+      const html = localGenerator(inputs, inputs.iaNivel, inputs.incluirImagens);
+      renderWorkPreview(html);
+    });
+
+    document.getElementById('previewBtn').addEventListener('click', ()=>{
+      const inputs = collectInputs();
+      const html = localGenerator(inputs, inputs.iaNivel, inputs.incluirImagens);
+      renderWorkPreview(html);
+    });
+
+    document.getElementById('downloadPdf').addEventListener('click', ()=>{ baixarPDF(); });
+    document.getElementById('downloadDoc').addEventListener('click', ()=>{ baixarWord(); });
+
+    document.getElementById('publishBtn').addEventListener('click', ()=>{ alert('Publicação / integração ainda não configurada (SDK disponível).') });
+    document.getElementById('undoBtn').addEventListener('click', ()=>{ alert('Desfazer não implementado — use histórico.'); });
+
+    // Save draft shortcut
+    document.getElementById('saveDraftBtn').addEventListener('click', saveDraft);
+
+    // Exports
+    function baixarPDF(){
+      const el = document.getElementById('preview');
+      setStatus('Preparando PDF...');
+      const opt = { margin:12, filename: 'trabalho-profissional.pdf', image:{type:'jpeg',quality:0.98}, html2canvas:{scale:2}, jsPDF:{unit:'mm',format:'a4',orientation:'portrait'} };
+      html2pdf().set(opt).from(el).save().then(()=> setStatus('PDF gerado')).catch(e=>{ console.error(e); setStatus('Erro ao gerar PDF'); });
+    }
+
+    async function baixarWord(){
+      setStatus('Preparando Word...');
+      const el = document.getElementById('preview');
+      const text = el.innerText || '';
+      const { Document, Packer, Paragraph, TextRun } = docx;
+      const doc = new Document({ sections:[{children:[ new Paragraph({children:[ new TextRun({text:'TRABALHO - Gerador Pro', bold:true}) ]}), new Paragraph({children:[ new TextRun(text) ]}) ] }] });
+      const blob = await Packer.toBlob(doc);
+      const url = URL.createObjectURL(blob); const a = document.createElement('a'); a.href = url; a.download = 'trabalho-profissional.docx'; a.click(); URL.revokeObjectURL(url);
+      setStatus('Word gerado');
+    }
+
+    // init small sample state
+    (function init(){
+      document.getElementById('tema').value = 'Aquecimento Global';
+      const sample = collectInputs();
+      renderWorkPreview(localGenerator(sample, sample.iaNivel, sample.incluirImagens));
+    })();
+  </script>
+</body>
+</html>
