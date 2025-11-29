@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Gerador Profissional de Trabalhos — Pro</title>
+
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;800&display=swap" rel="stylesheet">
+
+  <style>
+    :root{ --bg:#07060a; --panel:#0f1114; --muted:#98a1ad; --accent:#6b5cff; --accent-2:#20c997; --radius:12px; --card-pad:18px; }
+    *{box-sizing:border-box}
+    body{margin:0;font-family:Inter;color:#eaf2ff;background:#07060a}
+    header{display:flex;justify-content:space-between;padding:18px 28px;border-bottom:1px solid rgba(255,255,255,0.03)}
+    main{max-width:1200px;margin:26px auto;padding:0 18px;display:grid;grid-template-columns:360px 1fr;gap:22px}
+    .panel{background:#0f1114;padding:var(--card-pad);border-radius:var(--radius);border:1px solid rgba(255,255,255,0.02)}
+    label{font-size:13px;color:var(--muted);display:block;margin-bottom:8px}
+    input,select,textarea{width:100%;padding:10px;border-radius:10px;border:1px solid rgba(255,255,255,0.04);background:transparent;color:inherit}
+    .template-card{background:#111218;padding:12px;border-radius:10px;border:1px solid rgba(255,255,255,0.02);cursor:pointer}
+    .template-card.selected{outline:2px solid rgba(107,92,255,0.4)}
+    #preview{min-height:420px;padding:18px;background:#111218;border-radius:10px;overflow:auto}
+  </style>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/docx/7.6.0/browser/docx.umd.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/PptxGenJS/3.9.0/pptxgen.bundle.js"></script>
+</head>
+<body>
+  <header>
+    <h1>Gerador Profissional de Trabalhos — Pro</h1>
+  </header>
+
+  <main>
+    <aside class="panel">
+      <label>Tema</label>
+      <input id="tema" placeholder="Ex: Aquecimento Global" />
+
+      <label>Nível Escolar</label>
+      <select id="nivel">
+        <option>Ensino Fundamental</option>
+        <option>Ensino Médio</option>
+        <option>Ensino Superior</option>
+      </select>
+
+      <label>Nível da IA</label>
+      <select id="iaNivel">
+        <option value="forte">Forte</option>
+        <option value="media">Média</option>
+        <option value="leve">Leve</option>
+      </select>
+
+      <label>Template</label>
+      <div id="templatesList">
+        <div class="template-card selected" data-template="academico">Acadêmico</div>
+        <div class="template-card" data-template="moderno">Moderno</div>
+      </div>
+
+      <button id="gerarBtn">Gerar trabalho</button>
+    </aside>
+
+    <section class="panel">
+      <div id="preview"></div>
+    </section>
+  </main>
+
+  <script>
+    const templates = document.querySelectorAll('.template-card');
+    templates.forEach(t => t.addEventListener('click', ()=>{
+      templates.forEach(x=>x.classList.remove('selected'));
+      t.classList.add('selected');
+    }));
+
+    function gerarNivelTexto(nivel){
+      if(nivel === "Ensino Fundamental") return "Explicação simples, com frases curtas e exemplos fáceis de entender.";
+      if(nivel === "Ensino Médio") return "Explicação intermediária, com conceitos claros e linguagem objetiva.";
+      return "Explicação aprofundada, com conceitos técnicos e estrutura formal superior.";
+    }
+
+    function localGenerator(p){
+      const nivelTexto = gerarNivelTexto(p.nivel);
+      const depth = p.iaNivel === 'forte' ? 3 : p.iaNivel === 'media' ? 2 : 1;
+
+      return `
+        <h1 style='text-align:center'>${p.tema}</h1>
+        <h3>Introdução</h3>
+        <p>${nivelTexto} (Nível IA: ${depth})</p>
+
+        <h3>Desenvolvimento</h3>
+        <p>Conteúdo desenvolvido sobre ${p.tema}, adaptado ao nível escolhido.</p>
+
+        <h3>Conclusão</h3>
+        <p>Resumo final com fechamento apropriado ao tema.</p>
+      `;
+    }
+
+    document.getElementById('gerarBtn').addEventListener('click', ()=>{
+      const p = {
+        tema: document.getElementById('tema').value.trim(),
+        nivel: document.getElementById('nivel').value,
+        iaNivel: document.getElementById('iaNivel').value,
+      };
+
+      document.getElementById('preview').innerHTML = localGenerator(p);
+    });
+  </script>
+</body>
+</html>
