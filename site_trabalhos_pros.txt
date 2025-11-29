@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Gerador de Trabalhos Automático</title>
+<style>
+    body {
+        margin: 0;
+        font-family: Arial, sans-serif;
+        background: #0d0d0d;
+        color: #f2f2f2;
+    }
+
+    header {
+        background: #1a1a1a;
+        padding: 20px;
+        text-align: center;
+        font-size: 26px;
+        font-weight: bold;
+        border-bottom: 2px solid #333;
+    }
+
+    .container {
+        max-width: 900px;
+        margin: 30px auto;
+        padding: 20px;
+        background: #1a1a1a;
+        border-radius: 12px;
+        box-shadow: 0 0 15px rgba(255,255,255,0.1);
+    }
+
+    label {
+        display: block;
+        margin-top: 20px;
+        font-size: 18px;
+    }
+
+    input, select, textarea {
+        width: 100%;
+        padding: 12px;
+        margin-top: 8px;
+        border-radius: 8px;
+        border: none;
+        background: #333;
+        color: white;
+        font-size: 16px;
+    }
+
+    button {
+        width: 100%;
+        margin-top: 25px;
+        padding: 15px;
+        background: #4CAF50;
+        color: white;
+        font-size: 20px;
+        border: none;
+        border-radius: 8px;
+        cursor: pointer;
+    }
+
+    button:hover {
+        background: #45a049;
+    }
+
+    #resultado {
+        margin-top: 30px;
+        padding: 20px;
+        background: #262626;
+        border-radius: 10px;
+        white-space: pre-wrap;
+        font-size: 17px;
+    }
+</style>
+</head>
+<body>
+<header>GERADOR DE TRABALHOS AUTOMÁTICO</header>
+
+<div class="container">
+    <label for="nivel">Nível de Ensino:</label>
+    <select id="nivel">
+        <option value="fundamental">Ensino Fundamental</option>
+        <option value="medio">Ensino Médio</option>
+        <option value="superior">Ensino Superior</option>
+    </select>
+
+    <label for="tipo">Tipo do Trabalho:</label>
+    <select id="tipo">
+        <option value="texto">Texto Completo</option>
+        <option value="ppt">Apresentação (PowerPoint)</option>
+        <option value="word">Documento Word</option>
+    </select>
+
+    <label for="tema">Tema do Trabalho:</label>
+    <input type="text" id="tema" placeholder="Digite o tema do trabalho..." />
+
+    <label for="imgs">Incluir imagens geradas por IA?</label>
+    <select id="imgs">
+        <option value="nao">Não</option>
+        <option value="sim">Sim</option>
+    </select>
+
+    <button onclick="gerarTrabalho()">Gerar Trabalho</button>
+
+    <div id="resultado"></div>
+</div>
+
+<script>
+function gerarTrabalho() {
+    const nivel = document.getElementById("nivel").value;
+    const tipo = document.getElementById("tipo").value;
+    const tema = document.getElementById("tema").value.trim();
+    const imgs = document.getElementById("imgs").value;
+
+    if (!tema) {
+        alert("Digite um tema!");
+        return;
+    }
+
+    let texto = "";
+
+    // TEMAS GERADOS CORRETOS
+    texto += `TEMA ESCOLHIDO: ${tema.toUpperCase()}\n\n`;
+
+    if (nivel === "fundamental") {
+        texto += `🔵 TRABALHO — ENSINO FUNDAMENTAL\n\n`;
+        texto += `Introdução:\n${tema} é um assunto importante que ajuda os estudantes a compreenderem melhor o mundo ao seu redor. Neste trabalho vamos explicar de forma simples e objetiva o que é ${tema} e por que ele é importante.\n\n`;
+        texto += `Desenvolvimento:\nPara entender melhor sobre ${tema}, vamos explorar seus principais pontos, exemplos do dia a dia e a forma como ele aparece na vida das pessoas. Tudo explicado de forma clara e fácil para alunos do ensino fundamental.\n\n`;
+        texto += `Conclusão:\nCom este trabalho, aprendemos que ${tema} faz parte do nosso aprendizado e ajuda a desenvolver novos conhecimentos.`;
+    }
+
+    if (nivel === "medio") {
+        texto += `🟢 TRABALHO — ENSINO MÉDIO\n\n`;
+        texto += `Introdução:\nO tema ${tema} é relevante para compreender fenômenos sociais, científicos e culturais. Neste trabalho iremos analisar criticamente sua importância e impacto.\n\n`;
+        texto += `Desenvolvimento:\nAqui apresentamos conceitos aprofundados sobre ${tema}, contextualização histórica, exemplos reais e relação com conteúdos escolares. A explicação é feita de modo detalhado e coerente, adequada ao ensino médio.\n\n`;
+        texto += `Conclusão:\nA análise do tema ${tema} demonstra sua influência na sociedade e reforça sua importância para o desenvolvimento educacional.`;
+    }
+
+    if (nivel === "superior") {
+        texto += `🟣 TRABALHO ACADÊMICO — ENSINO SUPERIOR\n\n`;
+        texto += `Resumo:\nEste trabalho discute ${tema}, apresentando base teórica, revisão de literatura e análise crítica fundamentada.\n\n`;
+        texto += `Introdução:\n${tema} possui relevância acadêmica e é amplamente debatido em estudos científicos. O objetivo deste trabalho é explorar suas aplicações, teorias e contribuições.\n\n`;
+        texto += `Desenvolvimento:\nInclui fundamentação teórica, citações, análises, argumentos e dados relacionados ao tema ${tema}, seguindo padrões da escrita científica.\n\n`;
+        texto += `Conclusão:\nConclui-se que ${tema} apresenta grande importância para a área estudada e abre caminho para novas pesquisas.`;
+    }
+
+    if (imgs === "sim") {
+        texto += `\n\n🖼️ Imagens geradas por IA serão incluídas automaticamente conforme o tema (${tema}).`;
+    }
+
+    if (tipo === "ppt") {
+        texto += `\n\n📊 O conteúdo será estruturado em formato de apresentação PowerPoint, com tópicos organizados e visuais próprios.`;
+    }
+
+    if (tipo === "word") {
+        texto += `\n\n📄 O conteúdo será estruturado em formato Word, seguindo padrão formal e organizado.`;
+    }
+
+    document.getElementById("resultado").innerText = texto;
+}() {
+    const nivel = document.getElementById("nivel").value;
+    const tipo = document.getElementById("tipo").value;
+    const tema = document.getElementById("tema").value;
+    const imgs = document.getElementById("imgs").value;
+
+    if (!tema) {
+        alert("Digite um tema!");
+        return;
+    }
+
+    let texto = "";
+
+    if (nivel === "fundamental") {
+        texto += `🔵 TRABALHO – ENSINO FUNDAMENTAL\nTema: ${tema}\n\nIntrodução:\nO tema ${tema} é muito importante para o aprendizado das crianças, pois ajuda a desenvolver conhecimento e curiosidade...\n\nDesenvolvimento:\nAqui explicamos o tema de forma simples, clara e educativa...\n\nConclusão:\nAssim, entendemos que ${tema} faz parte do nosso aprendizado diário.`;
+    }
+
+    if (nivel === "medio") {
+        texto += `🟢 TRABALHO – ENSINO MÉDIO\nTema: ${tema}\n\nIntrodução:\nO tema ${tema} apresenta relevância acadêmica e social...\n\nDesenvolvimento:\nAqui exploramos conceitos mais detalhados, explicações complexas e exemplos reais...\n\nConclusão:\nO estudo sobre ${tema} demonstra sua contribuição para a formação crítica do estudante.`;
+    }
+
+    if (nivel === "superior") {
+        texto += `🟣 TRABALHO ACADÊMICO – ENSINO SUPERIOR\nTema: ${tema}\n\nResumo:\nEste trabalho aborda ${tema} com base em pesquisas científicas...
+\nIntrodução:\nO tema ${tema} possui relevância teórica e prática...
+\nDesenvolvimento:\nDiscussão aprofundada com fundamentação acadêmica...
+\nConclusão:\nConcluímos que ${tema} impacta a área estudada...`;
+    }
+
+    if (imgs === "sim") {
+        texto += `\n\n🖼️ Imagens geradas por IA serão incluídas automaticamente.`;
+    }
+
+    if (tipo === "ppt") {
+        texto += `\n\n📊 Este conteúdo será organizado em formato de apresentação PowerPoint.`;
+    }
+
+    if (tipo === "word") {
+        texto += `\n\n📄 Este conteúdo será montado em formato Word.`;
+    }
+
+    document.getElementById("resultado").innerText = texto;
+}
+</script>
+
+</body>
+</html>
