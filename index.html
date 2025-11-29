@@ -3,105 +3,295 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Gerador Profissional de Trabalhos — Pro</title>
-
+  <title>Gerador Profissional de Trabalhos — Pro (v2)</title>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;800&display=swap" rel="stylesheet">
-
   <style>
-    :root{ --bg:#07060a; --panel:#0f1114; --muted:#98a1ad; --accent:#6b5cff; --accent-2:#20c997; --radius:12px; --card-pad:18px; }
+    :root{--bg:#07060a;--panel:#0f1114;--muted:#98a1ad;--accent:#6b5cff;--accent-2:#20c997;--radius:12px}
     *{box-sizing:border-box}
-    body{margin:0;font-family:Inter;color:#eaf2ff;background:#07060a}
-    header{display:flex;justify-content:space-between;padding:18px 28px;border-bottom:1px solid rgba(255,255,255,0.03)}
-    main{max-width:1200px;margin:26px auto;padding:0 18px;display:grid;grid-template-columns:360px 1fr;gap:22px}
-    .panel{background:#0f1114;padding:var(--card-pad);border-radius:var(--radius);border:1px solid rgba(255,255,255,0.02)}
-    label{font-size:13px;color:var(--muted);display:block;margin-bottom:8px}
-    input,select,textarea{width:100%;padding:10px;border-radius:10px;border:1px solid rgba(255,255,255,0.04);background:transparent;color:inherit}
-    .template-card{background:#111218;padding:12px;border-radius:10px;border:1px solid rgba(255,255,255,0.02);cursor:pointer}
-    .template-card.selected{outline:2px solid rgba(107,92,255,0.4)}
-    #preview{min-height:420px;padding:18px;background:#111218;border-radius:10px;overflow:auto}
-  </style>
+    body{margin:0;font-family:Inter,system-ui,Arial;color:#eaf2ff;background:linear-gradient(180deg,#060509,#07060a);-webkit-font-smoothing:antialiased}
+    header{display:flex;align-items:center;gap:14px;padding:18px 26px;border-bottom:1px solid rgba(255,255,255,0.03)}
+    .logo{width:48px;height:48px;border-radius:10px;background:linear-gradient(135deg,var(--accent),#8a78ff);display:flex;align-items:center;justify-content:center;font-weight:800}
+    h1{margin:0;font-size:18px}
+    .subtitle{font-size:13px;color:var(--muted)}
 
+    .wrap{max-width:1200px;margin:28px auto;padding:0 20px;display:grid;grid-template-columns:360px 1fr;gap:22px}
+    .card{background:linear-gradient(180deg,var(--panel),rgba(255,255,255,0.01));padding:18px;border-radius:12px;border:1px solid rgba(255,255,255,0.02)}
+    label{display:block;font-size:13px;color:var(--muted);margin-bottom:8px}
+    input[type=text],select,textarea{width:100%;padding:10px;border-radius:8px;border:1px solid rgba(255,255,255,0.03);background:transparent;color:inherit}
+    textarea{min-height:100px}
+    .row{display:flex;gap:10px}
+    .btn{display:inline-block;padding:10px 12px;border-radius:9px;border:none;background:var(--accent);color:#fff;cursor:pointer}
+    .btn.ghost{background:transparent;border:1px solid rgba(255,255,255,0.04)}
+    .small{font-size:13px;color:var(--muted)}
+    #imgPreview{width:100%;border-radius:10px;margin-top:10px;display:none;object-fit:cover}
+
+    #previewArea{min-height:320px;padding:12px;background:#0b0c0e;border-radius:10px;border:1px solid rgba(255,255,255,0.02);overflow:auto}
+    .loader{height:6px;background:linear-gradient(90deg,transparent,var(--accent),transparent);border-radius:8px;animation:move 1.2s linear infinite}
+    @keyframes move{0%{background-position:0%}100%{background-position:200%}}
+
+    .downloads{display:flex;gap:8px;margin-top:12px}
+    .note{font-size:12px;color:var(--muted);margin-top:10px}
+
+    .template{padding:8px;border-radius:8px;background:rgba(255,255,255,0.02);cursor:pointer}
+    .template.selected{box-shadow:0 6px 20px rgba(0,0,0,0.6);outline:2px solid rgba(107,92,255,0.12)}
+
+    @media (max-width:980px){.wrap{grid-template-columns:1fr}}
+  </style>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/docx/7.6.0/browser/docx.umd.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/PptxGenJS/3.9.0/pptxgen.bundle.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
 </head>
 <body>
   <header>
-    <h1>Gerador Profissional de Trabalhos — Pro</h1>
+    <div class="logo">GT</div>
+    <div>
+      <h1>Gerador Profissional de Trabalhos — Pro (v2)</h1>
+      <div class="subtitle">Modo escuro • Exporta para PDF / Word / PowerPoint • Ens. Fundamental incluso</div>
+    </div>
   </header>
 
-  <main>
-    <aside class="panel">
-      <label>Tema</label>
-      <input id="tema" placeholder="Ex: Aquecimento Global" />
+  <main class="wrap">
+    <aside class="card">
+      <h3>Configurações</h3>
 
-      <label>Nível Escolar</label>
-      <select id="nivel">
-        <option>Ensino Fundamental</option>
-        <option>Ensino Médio</option>
-        <option>Ensino Superior</option>
-      </select>
-
-      <label>Nível da IA</label>
-      <select id="iaNivel">
-        <option value="forte">Forte</option>
-        <option value="media">Média</option>
-        <option value="leve">Leve</option>
-      </select>
-
-      <label>Template</label>
-      <div id="templatesList">
-        <div class="template-card selected" data-template="academico">Acadêmico</div>
-        <div class="template-card" data-template="moderno">Moderno</div>
+      <div style="margin-top:12px">
+        <label>Tema do trabalho</label>
+        <input id="tema" type="text" placeholder="Ex: Água, Fotossíntese, Segunda Guerra" oninput="onTemaChange()" />
+        <img id="imgPreview" alt="preview"/>
       </div>
 
-      <button id="gerarBtn">Gerar trabalho</button>
+      <div style="margin-top:10px">
+        <label>Formato de saída</label>
+        <select id="formato">
+          <option value="texto">Texto (exibir)</option>
+          <option value="pdf">PDF</option>
+          <option value="word">Word (.docx)</option>
+          <option value="powerpoint">PowerPoint (.pptx)</option>
+        </select>
+      </div>
+
+      <div style="margin-top:10px">
+        <label>Estilo</label>
+        <select id="estilo">
+          <option value="abnt">ABNT Completa</option>
+          <option value="simples">Simples Escolar</option>
+          <option value="moderno">Moderno com imagens</option>
+        </select>
+      </div>
+
+      <div style="margin-top:10px">
+        <label>Nível</label>
+        <select id="nivel">
+          <option value="fundamental">Ensino Fundamental</option>
+          <option value="medio">Ensino Médio</option>
+          <option value="superior">Ensino Superior</option>
+        </select>
+      </div>
+
+      <div style="margin-top:10px">
+        <label>IA (força)</label>
+        <select id="iaNivel">
+          <option value="forte">Forte (detalhado)</option>
+          <option value="media">Média (equilibrada)</option>
+          <option value="leve">Leve (resumido)</option>
+        </select>
+      </div>
+
+      <div style="margin-top:10px">
+        <label>Imagens automáticas</label>
+        <div class="row"><label class="small"><input id="incluirImagens" type="checkbox"/> Incluir imagens relacionadas ao tema</label></div>
+        <div style="margin-top:6px"><label class="small">Quantidade por seção</label><select id="qtdImagens"><option>0</option><option>1</option><option selected>2</option><option>3</option></select></div>
+      </div>
+
+      <div style="margin-top:10px">
+        <label>Opções</label>
+        <div class="row"><label class="small"><input id="addSumario" type="checkbox" checked/> Incluir sumário</label></div>
+        <div class="row"><label class="small"><input id="addReferencias" type="checkbox" checked/> Incluir referências (ABNT)</label></div>
+        <div class="row"><label class="small"><input id="addGrafico" type="checkbox"/> Incluir gráfico de exemplo</label></div>
+      </div>
+
+      <div style="margin-top:12px">
+        <label>Conectar IA (opcional)</label>
+        <input id="apiKey" type="text" placeholder="Cole a chave da API (opcional)" />
+        <div class="small">Sem chave, usa gerador local (rápido e offline).</div>
+      </div>
+
+      <div class="downloads" style="margin-top:12px">
+        <button class="btn" id="btnGerar" onclick="handleGerar()">Gerar Trabalho</button>
+        <button class="btn ghost" onclick="resetAll()">Limpar</button>
+      </div>
+
+      <div class="note">Dica: para PPTX/Word o site cria arquivos para baixar automaticamente. Se usar API, cole a chave para textos maiores.</div>
     </aside>
 
-    <section class="panel">
-      <div id="preview"></div>
+    <section class="card">
+      <div id="statusArea"></div>
+      <div id="previewArea">
+        <h2 style="margin-top:0">Preview do trabalho</h2>
+        <div class="small">Após gerar, você verá a capa, sumário, introdução, desenvolvimento (com 3 tópicos), conclusão e referências aqui.</div>
+      </div>
+
+      <div id="downloadBtns" style="margin-top:12px;display:none">
+        <button class="btn" onclick="baixarPDF()">Baixar PDF</button>
+        <button class="btn" onclick="baixarWord()">Baixar Word (.docx)</button>
+        <button class="btn" onclick="baixarPPT()">Baixar PowerPoint (.pptx)</button>
+      </div>
     </section>
   </main>
 
   <script>
-    const templates = document.querySelectorAll('.template-card');
-    templates.forEach(t => t.addEventListener('click', ()=>{
-      templates.forEach(x=>x.classList.remove('selected'));
-      t.classList.add('selected');
-    }));
-
-    function gerarNivelTexto(nivel){
-      if(nivel === "Ensino Fundamental") return "Explicação simples, com frases curtas e exemplos fáceis de entender.";
-      if(nivel === "Ensino Médio") return "Explicação intermediária, com conceitos claros e linguagem objetiva.";
-      return "Explicação aprofundada, com conceitos técnicos e estrutura formal superior.";
+    function onTemaChange(){
+      const tema = document.getElementById('tema').value.trim();
+      const img = document.getElementById('imgPreview');
+      if(tema.length<2){ img.style.display='none'; return }
+      img.src = `https://source.unsplash.com/900x400/?${encodeURIComponent(tema)}`;
+      img.style.display='block';
     }
 
-    function localGenerator(p){
-      const nivelTexto = gerarNivelTexto(p.nivel);
-      const depth = p.iaNivel === 'forte' ? 3 : p.iaNivel === 'media' ? 2 : 1;
-
-      return `
-        <h1 style='text-align:center'>${p.tema}</h1>
-        <h3>Introdução</h3>
-        <p>${nivelTexto} (Nível IA: ${depth})</p>
-
-        <h3>Desenvolvimento</h3>
-        <p>Conteúdo desenvolvido sobre ${p.tema}, adaptado ao nível escolhido.</p>
-
-        <h3>Conclusão</h3>
-        <p>Resumo final com fechamento apropriado ao tema.</p>
-      `;
+    function resetAll(){
+      document.getElementById('tema').value='';
+      document.getElementById('previewArea').innerHTML=`<h2 style='margin-top:0'>Preview do trabalho</h2><div class='small'>Após gerar, você verá a capa, sumário, introdução, desenvolvimento, conclusão e referências aqui.</div>`;
+      document.getElementById('imgPreview').style.display='none';
+      document.getElementById('downloadBtns').style.display='none';
+      setStatus('');
     }
 
-    document.getElementById('gerarBtn').addEventListener('click', ()=>{
-      const p = {
-        tema: document.getElementById('tema').value.trim(),
-        nivel: document.getElementById('nivel').value,
-        iaNivel: document.getElementById('iaNivel').value,
+    function setStatus(text, loading){
+      const s = document.getElementById('statusArea');
+      s.innerHTML = loading ? `<div class='loader'></div><div class='small' style='margin-top:8px'>${text}</div>` : `<div class='small'>${text}</div>`;
+    }
+
+    function buildPrompt(opts){
+      return `GERE UM TRABALHO COMPLETO SOBRE: ${opts.tema}.\nNível: ${opts.nivel} (fundamental/médio/superior).\nEstilo: ${opts.estilo}.\nTamanho: ${opts.tamanho || 'Médio'}.\nIncluir sumário: ${opts.addSumario}.\nIncluir referências: ${opts.addReferencias}.\nIncluir gráfico: ${opts.addGrafico}.\nForneça: capa, sumário (se pedido), introdução, desenvolvimento (3 tópicos), conclusão e referências.`;
+    }
+
+    function generateFundamentalText(tema){
+      return {
+        capa: `<h2 style='text-align:center'>${tema}</h2><p style='text-align:center'>Trabalho - Ensino Fundamental</p>` ,
+        introducao: `${tema} é um assunto importante para aprendermos coisas novas. Vamos explicar de forma simples o que é ${tema} e porque ele é importante.` ,
+        topicos: [
+          `O que é ${tema} (explicação curta e clara).`,
+          `Exemplos do dia a dia onde encontramos ${tema}.`,
+          `Por que devemos aprender sobre ${tema} e como podemos aplicar no cotidiano.`
+        ],
+        conclusao: `Com este trabalho aprendemos o básico sobre ${tema} e entendemos sua importância no dia a dia.`
       };
+    }
 
-      document.getElementById('preview').innerHTML = localGenerator(p);
-    });
+    function generateMedioText(tema){
+      return {
+        capa: `<h2 style='text-align:center'>${tema}</h2><p style='text-align:center'>Trabalho - Ensino Médio</p>` ,
+        introducao: `O tema ${tema} é relevante para compreender fenômenos sociais, científicos e culturais. Este trabalho analisa seus aspectos principais.` ,
+        topicos: [
+          `Definição e conceitos principais de ${tema}.`,
+          `Contextualização histórica e implicações sociais.`,
+          `Exemplos práticos e estudos de caso relacionados a ${tema}.`
+        ],
+        conclusao: `A análise de ${tema} revela sua importância para o conhecimento e para a sociedade moderna.`
+      };
+    }
+
+    function generateSuperiorText(tema){
+      return {
+        capa: `<h2 style='text-align:center'>${tema}</h2><p style='text-align:center'>Trabalho Acadêmico - Ensino Superior</p>` ,
+        introducao: `Este trabalho discute ${tema} a partir de uma perspectiva teórica, revisando literatura e propondo uma análise crítica.` ,
+        topicos: [
+          `Revisão bibliográfica e fundamentos teóricos sobre ${tema}.`,
+          `Metodologias e dados relevantes para o estudo de ${tema}.`,
+          `Discussão crítica, implicações e propostas para futuras pesquisas.`
+        ],
+        conclusao: `Conclui-se que ${tema} oferece importantes caminhos de pesquisa e contribuições para a área.`
+      };
+    }
+
+    async function handleGerar(){
+      const tema = document.getElementById('tema').value.trim();
+      if(!tema){ alert('Digite o tema do trabalho'); return }
+      const apiKey = document.getElementById('apiKey').value.trim();
+      const formato = document.getElementById('formato').value;
+      const estilo = document.getElementById('estilo').value;
+      const nivel = document.getElementById('nivel').value;
+      const iaNivel = document.getElementById('iaNivel').value;
+      const addGrafico = document.getElementById('addGrafico').checked;
+      const addSumario = document.getElementById('addSumario').checked;
+      const addReferencias = document.getElementById('addReferencias').checked;
+      const incluirImagens = document.getElementById('incluirImagens').checked;
+      const qtdImagens = parseInt(document.getElementById('qtdImagens').value,10) || 0;
+
+      setStatus('Gerando conteúdo — aguarde...', true);
+      document.getElementById('previewArea').innerHTML='';
+
+      let modelOutput = null;
+      try{
+        if(apiKey){
+          const prompt = buildPrompt({tema,estilo,nivel,iaNivel,addSumario,addReferencias,addGrafico});
+          const res = await fetch('https://api.openai.com/v1/chat/completions',{method:'POST',headers:{'Content-Type':'application/json','Authorization':'Bearer '+apiKey},body:JSON.stringify({model:'gpt-4o-mini',messages:[{role:'user',content:prompt}],max_tokens:1600})});
+          if(res.ok){ const j = await res.json(); modelOutput = j.choices?.[0]?.message?.content || null; }
+        }
+      }catch(e){ console.warn('API error',e); }
+
+      // If API worked and returned structured HTML, prefer it. Otherwise use local generator
+      let trabalho = '';
+      if(modelOutput){
+        trabalho = `<div>${modelOutput}</div>`;
+      }else{
+        let parts = null;
+        if(nivel==='fundamental') parts = generateFundamentalText(tema);
+        if(nivel==='medio') parts = generateMedioText(tema);
+        if(nivel==='superior') parts = generateSuperiorText(tema);
+
+        trabalho += `<div>${parts.capa}</div>`;
+        if(addSumario){ trabalho += `<h3>SUMÁRIO</h3><ol><li>Introdução</li><li>Desenvolvimento</li><li>Conclusão</li>${addReferencias?'<li>Referências</li>':''}</ol>` }
+        trabalho += `<h3>INTRODUÇÃO</h3><p>${parts.introducao}</p>`;
+        trabalho += `<h3>DESENVOLVIMENTO</h3>`;
+        parts.topicos.forEach((t,i)=>{
+          trabalho += `<h4>${i+1}) ${t}</h4><p>${t} Explicado de maneira clara e adequada ao nível ${nivel}.</p>`;
+          if(incluirImagens && i < qtdImagens) trabalho += `<img src="https://source.unsplash.com/1100x400/?${encodeURIComponent(tema)}&sig=${i}" style="max-width:100%;border-radius:8px;margin:8px 0">`;
+        });
+        trabalho += `<h3>CONCLUSÃO</h3><p>${parts.conclusao}</p>`;
+        if(addReferencias) trabalho += `<h3>REFERÊNCIAS</h3><p>SILVA, J. Exemplo. 2023.</p>`;
+      }
+
+      setStatus('Conteúdo pronto');
+      document.getElementById('previewArea').innerHTML = trabalho;
+      document.getElementById('downloadBtns').style.display = 'flex';
+    }
+
+    function renderChart(){
+      const canvas = document.createElement('canvas'); canvas.id='chartSample'; canvas.style.maxHeight='240px';
+      document.getElementById('previewArea').appendChild(canvas);
+      const ctx = canvas.getContext('2d');
+      new Chart(ctx,{type:'bar',data:{labels:['A','B','C','D'],datasets:[{label:'Exemplo',data:[12,19,8,15]}]},options:{responsive:true}});
+    }
+
+    function baixarPDF(){
+      const el = document.getElementById('previewArea'); setStatus('Gerando PDF...', true);
+      const opt = { margin:12, filename: 'trabalho.pdf', image:{type:'jpeg',quality:0.98}, html2canvas:{scale:2}, jsPDF:{unit:'mm',format:'a4',orientation:'portrait'} };
+      html2pdf().set(opt).from(el).save().then(()=> setStatus('PDF gerado'));
+    }
+
+    async function baixarWord(){
+      setStatus('Gerando .docx...', true);
+      const contentEl = document.getElementById('previewArea');
+      const text = contentEl.innerText || 'Trabalho gerado';
+      const { Document, Packer, Paragraph, TextRun } = docx;
+      const doc = new Document({sections:[{children:[new Paragraph({children:[new TextRun('TRABALHO GERADO')]}), new Paragraph({children:[new TextRun(text)]})]}]});
+      const blob = await Packer.toBlob(doc);
+      const url = URL.createObjectURL(blob); const a = document.createElement('a'); a.href=url; a.download='trabalho.docx'; a.click(); URL.revokeObjectURL(url);
+      setStatus('Word gerado');
+    }
+
+    function baixarPPT(){
+      setStatus('Gerando .pptx...', true);
+      const tema = document.getElementById('tema').value || 'Trabalho';
+      const pptx = new PptxGenJS(); const titleColor='FFFFFF'; const bgColor='222222';
+      let s1 = pptx.addSlide(); s1.background={color:bgColor}; s1.addText(tema,{x:0.5,y:1.2,w:8.5,h:1.5,fontSize:28,color:titleColor,bold:true});
+      let s2 = pptx.addSlide(); s2.background={color:bgColor}; s2.addText('Introdução',{x:0.5,y:0.3,fontSize:20,color:titleColor,bold:true});
+      s2.addText((document.getElementById('previewArea').innerText||'').slice(0,450),{x:0.5,y:1.0,fontSize:12,color:'DDDDDD',w:9});
+      pptx.writeFile({fileName:`${tema}.pptx`}).then(()=> setStatus('PowerPoint gerado'));
+    }
+
   </script>
 </body>
 </html>
